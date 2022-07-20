@@ -105,13 +105,17 @@ def winner_checker(printable_states, print_result=True):
     return ended
 
 
-def random_picker(printable_states):
+def random_picker(printable_states, first_player=False):
+    if not first_player:
+        tick = 'O'
+    else:
+        tick = 'X'
     print('Making move level "easy"')
     options = list(range(9))
     ran_choice = random.choice(options)
     while printable_states[ran_choice] != ' ':
         ran_choice = random.choice(options)
-    printable_states[ran_choice] = 'O'
+    printable_states[ran_choice] = tick
     print('---------')
     print(f'| {printable_states[0]} {printable_states[1]} {printable_states[2]} |')
     print(f'| {printable_states[3]} {printable_states[4]} {printable_states[5]} |')
@@ -137,4 +141,44 @@ def ex_2():
     winner_checker(printable_states)
 
 
-ex_2()
+def ex_3():
+    start_end_game = input('Input command:')
+    while start_end_game != 'exit':
+        if len(start_end_game.split()) != 3:
+            print('Bad parameters!')
+            start_end_game = input('Input command:')
+        else:
+            command, ply1, ply2 = start_end_game.split()
+            if command == 'start':
+                if ply1 or ply2 in ['user', 'easy']:
+                    printable_states = [' ']*9
+                    print()
+                    print('---------')
+                    print(f'| {printable_states[0]} {printable_states[1]} {printable_states[2]} |')
+                    print(f'| {printable_states[3]} {printable_states[4]} {printable_states[5]} |')
+                    print(f'| {printable_states[6]} {printable_states[7]} {printable_states[8]} |')
+                    print('---------')
+                    ended = False
+                    while not ended:
+                        if ply1 == 'user':
+                            coordinate_picker(printable_states)
+                        else:
+                            random_picker(printable_states, True)
+                        ended = winner_checker(printable_states, False)
+                        if not ended:
+                            if ply2 == 'user':
+                                coordinate_picker(printable_states)
+                            else:
+                                random_picker(printable_states)
+                            ended = winner_checker(printable_states, False)
+                    winner_checker(printable_states)
+                    start_end_game = input('Input command:')
+                else:
+                    print('Bad parameters!')
+                    start_end_game = input('Input command:')
+            else:
+                print('Bad parameters!')
+                start_end_game = input('Input command:')
+
+
+ex_3()
