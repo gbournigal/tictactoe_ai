@@ -105,12 +105,13 @@ def winner_checker(printable_states, print_result=True):
     return ended
 
 
-def random_picker(printable_states, first_player=False):
+def random_picker(printable_states, first_player=False, from_medium=False):
     if not first_player:
         tick = 'O'
     else:
         tick = 'X'
-    print('Making move level "easy"')
+    if not from_medium:
+        print('Making move level "easy"')
     options = list(range(9))
     ran_choice = random.choice(options)
     while printable_states[ran_choice] != ' ':
@@ -141,7 +142,7 @@ def ex_2():
     winner_checker(printable_states)
 
 
-def ex_3():
+def ex_4():
     start_end_game = input('Input command:')
     while start_end_game != 'exit':
         if len(start_end_game.split()) != 3:
@@ -162,14 +163,18 @@ def ex_3():
                     while not ended:
                         if ply1 == 'user':
                             coordinate_picker(printable_states)
-                        else:
+                        elif ply1=='easy':
                             random_picker(printable_states, True)
+                        elif ply1=='medium':
+                            medium_move(printable_states, True)
                         ended = winner_checker(printable_states, False)
                         if not ended:
                             if ply2 == 'user':
                                 coordinate_picker(printable_states)
-                            else:
+                            elif ply2=='easy':
                                 random_picker(printable_states)
+                            elif ply2=='medium':
+                                medium_move(printable_states)
                             ended = winner_checker(printable_states, False)
                     winner_checker(printable_states)
                     start_end_game = input('Input command:')
@@ -181,4 +186,49 @@ def ex_3():
                 start_end_game = input('Input command:')
 
 
-ex_3()
+def medium_move(printable_states, first_player=False):
+    if not first_player:
+        tick = 'O'
+        enemy = 'X'
+    else:
+        tick = 'X'
+        enemy = 'O'
+    print('Making move level "medium"')
+    empty_selections = [i for i in range(len(printable_states)) if printable_states[i] == ' ']
+    moves_left = len(empty_selections)
+    for i in empty_selections:
+        printable_states[i] = tick
+        result = winner_checker(printable_states, False)
+        if result:
+            break
+        else:
+            printable_states[i] = ' '
+    if winner_checker(printable_states, False):
+        print('---------')
+        print(f'| {printable_states[0]} {printable_states[1]} {printable_states[2]} |')
+        print(f'| {printable_states[3]} {printable_states[4]} {printable_states[5]} |')
+        print(f'| {printable_states[6]} {printable_states[7]} {printable_states[8]} |')
+        print('---------')
+    else:
+        for i in empty_selections:
+            printable_states[i] = enemy
+            result = winner_checker(printable_states, False)
+            if result:
+               printable_states[i] = tick
+               print('---------')
+               print(f'| {printable_states[0]} {printable_states[1]} {printable_states[2]} |')
+               print(f'| {printable_states[3]} {printable_states[4]} {printable_states[5]} |')
+               print(f'| {printable_states[6]} {printable_states[7]} {printable_states[8]} |')
+               print('---------')
+               break
+            else:
+               printable_states[i] = ' '
+    if moves_left == len([i for i in range(len(printable_states)) if printable_states[i] == ' ']):
+        random_picker(printable_states, first_player, from_medium=True)
+
+
+
+
+
+
+ex_4()
