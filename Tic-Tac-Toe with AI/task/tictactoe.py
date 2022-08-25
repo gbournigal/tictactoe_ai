@@ -1,5 +1,13 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Aug 24 10:21:48 2022
+
+@author: gbournigal
+"""
+
 # write your code here
 import random
+import math
 
 
 def ex_1():
@@ -228,7 +236,47 @@ def medium_move(printable_states, first_player=False):
 
 
 
+def hard_move(printable_states, first_player=False):
+    if not first_player:
+        tick = 'O'
+        enemy = 'X'
+    else:
+        tick = 'X'
+        enemy = 'O'
+    print('Making move level "medium"')
+    
+    bestScore = -math.inf
+    bestMove = None
+    for move in empty_selections:
+        printable_states[move] = tick
+        score = minimax(False, tick, printable_states)
 
+def make_best_move():
+    bestScore = -math.inf
+    bestMove = None
+    for move in ticTacBoard.get_possible_moves():
+        ticTacBoard.make_move(move)
+        score = minimax(False, aiPlayer, ticTacBoard)
+        ticTacBoard.undo()
+        if (score > bestScore):
+            bestScore = score
+            bestMove = move
+    ticTacBoard.make_move(bestMove)
+
+def minimax(isMaxTurn, maximizerMark, board):
+    state = board.get_state()
+    if (state is State.DRAW):
+        return 0
+    elif (state is State.OVER):
+        return 1 if board.get_winner() is maximizerMark else -1
+
+    scores = []
+    for move in board.get_possible_moves():
+        board.make_move(move)
+        scores.append(minimax(not isMaxTurn, maximizerMark, board))
+        board.undo()
+
+    return max(scores) if isMaxTurn else min(scores)
 
 
 ex_4()
