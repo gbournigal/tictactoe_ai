@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Aug 24 10:21:48 2022
-
-@author: gbournigal
-"""
-
 # write your code here
 import random
 import math
@@ -69,48 +62,61 @@ def coordinate_picker(printable_states):
             coordinate_picker(printable_states)
 
 
-def winner_checker(printable_states, print_result=True):
+def winner_checker(printable_states, print_result=True, return_winner=False):
     if (printable_states[0] == printable_states[1] == printable_states[2]) and printable_states[0] != ' ':
         ended = True
+        winner = printable_states[0]
         if print_result:
-            print(f'{printable_states[0]} wins')
+            print(f'{winner} wins')
     elif (printable_states[3] == printable_states[4] == printable_states[5]) and printable_states[3] != ' ':
         ended = True
+        winner = printable_states[3]
         if print_result:
-            print(f'{printable_states[3]} wins')
+            print(f'{winner} wins')
     elif (printable_states[6] == printable_states[7] == printable_states[8]) and printable_states[7] != ' ':
         ended = True
+        winner = printable_states[6]
         if print_result:
-            print(f'{printable_states[6]} wins')
+            print(f'{winner} wins')
     elif (printable_states[0] == printable_states[4] == printable_states[8]) and printable_states[4] != ' ':
         ended = True
+        winner = printable_states[0]
         if print_result:
-            print(f'{printable_states[0]} wins')
+            print(f'{winner} wins')
     elif (printable_states[2] == printable_states[4] == printable_states[6]) and printable_states[4] != ' ':
         ended = True
+        winner = printable_states[2]
         if print_result:
-            print(f'{printable_states[2]} wins')
+            print(f'{winner} wins')
     elif (printable_states[0] == printable_states[3] == printable_states[6]) and printable_states[6] != ' ':
         ended = True
+        winner = printable_states[0]
         if print_result:
-            print(f'{printable_states[0]} wins')
+            print(f'{winner} wins')
     elif (printable_states[1] == printable_states[4] == printable_states[7]) and printable_states[7] != ' ':
         ended = True
+        winner = printable_states[1]
         if print_result:
-            print(f'{printable_states[1]} wins')
+            print(f'{winner} wins')
     elif (printable_states[2] == printable_states[5] == printable_states[8]) and printable_states[8] != ' ':
         ended = True
+        winner = printable_states[2]
         if print_result:
-            print(f'{printable_states[2]} wins')
+            print(f'{winner} wins')
     elif ' ' in printable_states:
         ended = False
+        winner = 'not finished'
         if print_result:
             print('Game not finished')
     else:
         ended = True
+        winner = 'draw'
         if print_result:
             print('Draw')
-    return ended
+    if not return_winner:
+        return ended
+    else:
+        return ended, winner
 
 
 def random_picker(printable_states, first_player=False, from_medium=False):
@@ -159,7 +165,7 @@ def ex_4():
         else:
             command, ply1, ply2 = start_end_game.split()
             if command == 'start':
-                if ply1 or ply2 in ['user', 'easy']:
+                if ply1 and ply2 in ['user', 'easy', 'medium', 'hard']:
                     printable_states = [' ']*9
                     print()
                     print('---------')
@@ -175,6 +181,8 @@ def ex_4():
                             random_picker(printable_states, True)
                         elif ply1=='medium':
                             medium_move(printable_states, True)
+                        elif ply1=='hard':
+                            hard_move(printable_states, True)
                         ended = winner_checker(printable_states, False)
                         if not ended:
                             if ply2 == 'user':
@@ -183,6 +191,8 @@ def ex_4():
                                 random_picker(printable_states)
                             elif ply2=='medium':
                                 medium_move(printable_states)
+                            elif ply2=='hard':
+                                hard_move(printable_states)
                             ended = winner_checker(printable_states, False)
                     winner_checker(printable_states)
                     start_end_game = input('Input command:')
@@ -237,44 +247,43 @@ def medium_move(printable_states, first_player=False):
 
 
 def hard_move(printable_states, first_player=False):
+    empty_selections = [i for i in range(len(printable_states)) if printable_states[i] == ' ']
     if not first_player:
         tick = 'O'
-        enemy = 'X'
     else:
         tick = 'X'
-        enemy = 'O'
-    print('Making move level "medium"')
+    print('Making move level "hard"')
     
     bestScore = -math.inf
     bestMove = None
     for move in empty_selections:
         printable_states[move] = tick
         score = minimax(False, tick, printable_states)
-
-def make_best_move():
-    bestScore = -math.inf
-    bestMove = None
-    for move in ticTacBoard.get_possible_moves():
-        ticTacBoard.make_move(move)
-        score = minimax(False, aiPlayer, ticTacBoard)
-        ticTacBoard.undo()
-        if (score > bestScore):
+        printable_states[move] = ' '
+        if score > bestScore:
             bestScore = score
             bestMove = move
-    ticTacBoard.make_move(bestMove)
+    printable_states[bestMove] = tick
+    print('---------')
+    print(f'| {printable_states[0]} {printable_states[1]} {printable_states[2]} |')
+    print(f'| {printable_states[3]} {printable_states[4]} {printable_states[5]} |')
+    print(f'| {printable_states[6]} {printable_states[7]} {printable_states[8]} |')
+    print('---------')
+    
 
 def minimax(isMaxTurn, maximizerMark, board):
-    state = board.get_state()
-    if (state is State.DRAW):
+    empty_selections = [i for i in range(len(board)) if board[i] == ' ']
+    state, winner = winner_checker(board, False, True)
+    if (state is True and winner == 'draw'):
         return 0
-    elif (state is State.OVER):
-        return 1 if board.get_winner() is maximizerMark else -1
+    elif (state is True):
+        return 1 if winner is maximizerMark else -1
 
     scores = []
-    for move in board.get_possible_moves():
-        board.make_move(move)
+    for move in empty_selections:
+        board[move] = 'X' if len(empty_selections) % 2 != 0 else 'O'
         scores.append(minimax(not isMaxTurn, maximizerMark, board))
-        board.undo()
+        board[move] = ' '
 
     return max(scores) if isMaxTurn else min(scores)
 
